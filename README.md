@@ -1,17 +1,17 @@
-# study
+# study — 考研学习追踪 App
 
-A study tracking iOS app built with SwiftUI + SwiftData, designed for graduate school exam preparation.
+基于 SwiftUI + SwiftData 构建的 iOS 学习追踪应用，专为考研备考设计。
 
-## Features
+## 功能
 
-- **Daily Plan** — Plan tasks by day, grouped by morning / afternoon / evening periods
-- **Wrong Answer Book** — Track mistakes with tags, photos, and categories
-- **Knowledge Points** — Record key concepts with multi-image support and custom tags
-- **Stage Notes** — Outline, ideas, and useful tools organized by subject
-- **Data Backup** — Export raw database, JSON, or PDF report
+- **每日计划** — 按早/中/晚时间段规划每日任务，支持周总结生成
+- **错题本** — 记录错题，支持标签、拍照、分类筛选
+- **知识点** — 记录重点知识，支持多图、自定义标签
+- **阶段笔记** — 总纲、想法、工具三类笔记，按科目分组
+- **数据备份** — 支持导出原始数据库、JSON、PDF 报告
 
-## Tech Stack
+## 技术栈
 
-- SwiftUI + SwiftData (iOS 17.0+)
-- PDFKit for report generation
-- DeepSeek API for weekly summary generation
+- SwiftUI + SwiftData（iOS 17.0+）
+- PDFKit 生成 PDF 报告
+- DeepSeek API 生成周总结
