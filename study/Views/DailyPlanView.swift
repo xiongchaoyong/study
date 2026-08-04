@@ -330,7 +330,7 @@ struct DailyPlanView: View {
                     .foregroundStyle(
                         isPastDate
                             ? (task.isCompleted ? .green.opacity(0.5) : .gray.opacity(0.25))
-                            : (task.isCompleted ? .green : .gray.opacity(0.45))
+                            : (task.isCompleted ? .green : Color.lavender)
                     )
             }
             .buttonStyle(.plain)
@@ -339,7 +339,7 @@ struct DailyPlanView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.body)
-                    .foregroundStyle(isPastDate ? .gray.opacity(0.6) : (task.isCompleted ? .secondary : .primary))
+                    .foregroundStyle(isPastDate ? .gray.opacity(0.6) : (task.isCompleted ? .secondary : Color.lavender))
                     .strikethrough(task.isCompleted, color: .secondary)
                 if !task.notes.isEmpty {
                     Text(task.notes)

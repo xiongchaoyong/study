@@ -122,6 +122,47 @@ struct TagDTO: Codable {
     }
 }
 
+// MARK: - CRC32 helper
+
+private extension Data {
+    func crc32() -> UInt32 {
+        let table: [UInt32] = {
+            var t = [UInt32](repeating: 0, count: 256)
+            for n in 0..<256 {
+                var c = UInt32(n)
+                for _ in 0..<8 {
+                    if c & 1 != 0 {
+                        c = 0xEDB88320 ^ (c >> 1)
+                    } else {
+                        c >>= 1
+                    }
+                }
+                t[n] = c
+            }
+            return t
+        }()
+
+        var crc: UInt32 = 0xFFFFFFFF
+        for byte in self {
+            let idx = Int((crc ^ UInt32(byte)) & 0xFF)
+            crc = table[idx] ^ (crc >> 8)
+        }
+        return crc ^ 0xFFFFFFFF
+    }
+}
+
+// MARK: - Little-endian helpers
+
+private func uint16LE(_ value: UInt16) -> Data {
+    var v = value.littleEndian
+    return Data(bytes: &v, count: 2)
+}
+
+private func uint32LE(_ value: UInt32) -> Data {
+    var v = value.littleEndian
+    return Data(bytes: &v, count: 4)
+}
+
 // MARK: - Export service
 
 enum DataExportService {
@@ -174,7 +215,7 @@ enum DataExportService {
         return url
     }
 
-    // MARK: - Raw database export
+    // MARK: - Raw database export (zipped)
 
     static func exportDatabase() -> URL? {
         let fileManager = FileManager.default
@@ -186,29 +227,136 @@ enum DataExportService {
         let walURL = appSupport.appendingPathComponent("default.store-wal")
         let shmURL = appSupport.appendingPathComponent("default.store-shm")
 
-        let tempDir = fileManager.temporaryDirectory
-            .appendingPathComponent("study-db-\(dateFormatter.string(from: Date()))")
-        try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-
-        let destStore = tempDir.appendingPathComponent("default.store")
-        let destWAL = tempDir.appendingPathComponent("default.store-wal")
-        let destSHM = tempDir.appendingPathComponent("default.store-shm")
-
-        var copied = false
-
+        var filesToZip: [(URL, String)] = []
         if fileManager.fileExists(atPath: storeURL.path) {
-            try? fileManager.copyItem(at: storeURL, to: destStore)
-            copied = true
-            // Copy WAL and SHM if they exist (for clean restore)
-            if fileManager.fileExists(atPath: walURL.path) {
-                try? fileManager.copyItem(at: walURL, to: destWAL)
-            }
-            if fileManager.fileExists(atPath: shmURL.path) {
-                try? fileManager.copyItem(at: shmURL, to: destSHM)
-            }
+            filesToZip.append((storeURL, "default.store"))
+        }
+        if fileManager.fileExists(atPath: walURL.path) {
+            filesToZip.append((walURL, "default.store-wal"))
+        }
+        if fileManager.fileExists(atPath: shmURL.path) {
+            filesToZip.append((shmURL, "default.store-shm"))
         }
 
-        return copied ? tempDir : nil
+        guard !filesToZip.isEmpty else { return nil }
+
+        let tempDir = fileManager.temporaryDirectory
+        let zipURL = tempDir.appendingPathComponent("study-db-\(dateFormatter.string(from: Date())).zip")
+
+        // Create zip archive
+        let success = createZip(files: filesToZip, destination: zipURL)
+        return success ? zipURL : nil
+    }
+
+    private static func createZip(files: [(sourceURL: URL, name: String)], destination: URL) -> Bool {
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent("db-export-\(UUID().uuidString)")
+        defer { try? fileManager.removeItem(at: tempDir) }
+
+        guard let _ = try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true) else {
+            return false
+        }
+
+        // Copy files to temp dir with clean names
+        for (url, name) in files {
+            let dest = tempDir.appendingPathComponent(name)
+            guard (try? fileManager.copyItem(at: url, to: dest)) != nil else { return false }
+        }
+
+        // Use NSFileCoordinator + coordinated read
+        var result = false
+        let coordinator = NSFileCoordinator()
+        coordinator.coordinate(writingItemAt: destination, options: .forReplacing, error: nil) { writeURL in
+            // Write a simple zip manually
+            result = writeZipArchive(sourceDir: tempDir, to: writeURL)
+        }
+        return result
+    }
+
+    private static func writeZipArchive(sourceDir: URL, to zipURL: URL) -> Bool {
+        let fileManager = FileManager.default
+        guard let contents = try? fileManager.contentsOfDirectory(at: sourceDir, includingPropertiesForKeys: nil) else {
+            return false
+        }
+
+        // Build zip manually
+        var centralDirectory = Data()
+        var localFiles = Data()
+        var offset: UInt32 = 0
+
+        for fileURL in contents {
+            let fileName = fileURL.lastPathComponent
+            guard let fileData = try? Data(contentsOf: fileURL) else { continue }
+            let fileNameData = fileName.data(using: .utf8)!
+            let crc = fileData.crc32()
+            let fileSize = UInt32(fileData.count)
+            let nameLen = UInt16(fileNameData.count)
+
+            // Local file header
+            var localHeader = Data()
+            localHeader.append(contentsOf: [0x50, 0x4B, 0x03, 0x04]) // signature
+            localHeader.append(uint16LE(20)) // version needed
+            localHeader.append(uint16LE(0)) // flags
+            localHeader.append(uint16LE(0)) // compression (store)
+            localHeader.append(uint16LE(0)) // mod time
+            localHeader.append(uint16LE(0)) // mod date
+            localHeader.append(uint32LE(crc)) // crc32
+            localHeader.append(uint32LE(fileSize)) // compressed size
+            localHeader.append(uint32LE(fileSize)) // uncompressed size
+            localHeader.append(uint16LE(nameLen)) // file name length
+            localHeader.append(uint16LE(0)) // extra field length
+            localHeader.append(fileNameData)
+
+            localFiles.append(localHeader)
+            localFiles.append(fileData)
+
+            // Central directory entry
+            var cdEntry = Data()
+            cdEntry.append(contentsOf: [0x50, 0x4B, 0x01, 0x02]) // signature
+            cdEntry.append(uint16LE(20)) // version made by
+            cdEntry.append(uint16LE(20)) // version needed
+            cdEntry.append(uint16LE(0)) // flags
+            cdEntry.append(uint16LE(0)) // compression
+            cdEntry.append(uint16LE(0)) // mod time
+            cdEntry.append(uint16LE(0)) // mod date
+            cdEntry.append(uint32LE(crc))
+            cdEntry.append(uint32LE(fileSize))
+            cdEntry.append(uint32LE(fileSize))
+            cdEntry.append(uint16LE(nameLen))
+            cdEntry.append(uint16LE(0)) // extra field length
+            cdEntry.append(uint16LE(0)) // file comment length
+            cdEntry.append(uint16LE(0)) // disk number start
+            cdEntry.append(uint16LE(0)) // internal file attributes
+            cdEntry.append(uint32LE(0)) // external file attributes
+            cdEntry.append(uint32LE(offset)) // relative offset
+            cdEntry.append(fileNameData)
+            centralDirectory.append(cdEntry)
+
+            offset += UInt32(localHeader.count + fileData.count)
+        }
+
+        // End of central directory record
+        var eocd = Data()
+        eocd.append(contentsOf: [0x50, 0x4B, 0x05, 0x06]) // signature
+        eocd.append(uint16LE(0)) // disk number
+        eocd.append(uint16LE(0)) // disk with central directory
+        eocd.append(uint16LE(UInt16(contents.count))) // entries on disk
+        eocd.append(uint16LE(UInt16(contents.count))) // total entries
+        eocd.append(uint32LE(UInt32(centralDirectory.count))) // central directory size
+        eocd.append(uint32LE(offset)) // offset of central directory
+        eocd.append(uint16LE(0)) // comment length
+
+        var zipData = Data()
+        zipData.append(localFiles)
+        zipData.append(centralDirectory)
+        zipData.append(eocd)
+
+        do {
+            try zipData.write(to: zipURL)
+            return true
+        } catch {
+            return false
+        }
     }
 
     // MARK: - PDF export
