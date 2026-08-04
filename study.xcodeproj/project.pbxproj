@@ -1,0 +1,375 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* studyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* studyApp.swift */; };
+		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* ContentView.swift */; };
+		A10000000000000000000003 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* ColorExtension.swift */; };
+		A10000000000000000000006 /* WrongAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* WrongAnswer.swift */; };
+		A1000000000000000000000B /* WrongAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000B /* WrongAnswerView.swift */; };
+		A1000000000000000000000C /* AddWrongAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000C /* AddWrongAnswerView.swift */; };
+		A1000000000000000000000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* Assets.xcassets */; };
+		A10000000000000000000010 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* ImagePickerView.swift */; };
+		A10000000000000000000011 /* WrongAnswerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* WrongAnswerDetailView.swift */; };
+		A10000000000000000000013 /* KnowledgePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* KnowledgePoint.swift */; };
+		A10000000000000000000014 /* KnowledgePointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* KnowledgePointView.swift */; };
+		A10000000000000000000015 /* AddKnowledgePointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* AddKnowledgePointView.swift */; };
+		A10000000000000000000016 /* KnowledgePointDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* KnowledgePointDetailView.swift */; };
+		A10000000000000000000017 /* DailyTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* DailyTask.swift */; };
+		A10000000000000000000018 /* DailyPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000018 /* DailyPlanView.swift */; };
+		A10000000000000000000019 /* AddDailyTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* AddDailyTaskView.swift */; };
+		A1000000000000000000001A /* DeepSeekService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001A /* DeepSeekService.swift */; };
+		A1000000000000000000001B /* WeeklySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001B /* WeeklySummary.swift */; };
+		A1000000000000000000001C /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001C /* Tag.swift */; };
+		A1000000000000000000001D /* KnowledgePointImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001D /* KnowledgePointImage.swift */; };
+		913A594B3804C9D8A2A2E5F1 /* StageNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAF31EDCD25BB15763F2BFA /* StageNote.swift */; };
+		9B6A46F3A3DEC5CB8B3A2674 /* StageNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8676796944E1EAB2452CED9 /* StageNoteView.swift */; };
+		799E472BF7F5A8BAACC26DFC /* AddStageNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */; };
+		A1000000000000000000001E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001E /* SettingsView.swift */; };
+		A1000000000000000000001F /* DataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001F /* DataExportService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B10000000000000000000001 /* studyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = studyApp.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* WrongAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrongAnswer.swift; sourceTree = "<group>"; };
+		B1000000000000000000000B /* WrongAnswerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrongAnswerView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000C /* AddWrongAnswerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWrongAnswerView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1000000000000000000000E /* study.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000010 /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* WrongAnswerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrongAnswerDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* KnowledgePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgePoint.swift; sourceTree = "<group>"; };
+		B10000000000000000000014 /* KnowledgePointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgePointView.swift; sourceTree = "<group>"; };
+		B10000000000000000000015 /* AddKnowledgePointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKnowledgePointView.swift; sourceTree = "<group>"; };
+		B10000000000000000000016 /* KnowledgePointDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgePointDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000017 /* DailyTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTask.swift; sourceTree = "<group>"; };
+		B10000000000000000000018 /* DailyPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanView.swift; sourceTree = "<group>"; };
+		B10000000000000000000019 /* AddDailyTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDailyTaskView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001A /* DeepSeekService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekService.swift; sourceTree = "<group>"; };
+		B1000000000000000000001B /* WeeklySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklySummary.swift; sourceTree = "<group>"; };
+		B1000000000000000000001C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		B1000000000000000000001D /* KnowledgePointImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgePointImage.swift; sourceTree = "<group>"; };
+		4CAF31EDCD25BB15763F2BFA /* StageNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageNote.swift; sourceTree = "<group>"; };
+		F8676796944E1EAB2452CED9 /* StageNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageNoteView.swift; sourceTree = "<group>"; };
+		E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStageNoteView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001F /* DataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExportService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C10000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000002 /* study */,
+				D10000000000000000000005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D10000000000000000000002 /* study */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000001 /* studyApp.swift */,
+				B10000000000000000000002 /* ContentView.swift */,
+				B10000000000000000000003 /* ColorExtension.swift */,
+				D10000000000000000000003 /* Models */,
+				D10000000000000000000004 /* Views */,
+				D10000000000000000000006 /* Services */,
+				B1000000000000000000000D /* Assets.xcassets */,
+			);
+			path = study;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000006 /* WrongAnswer.swift */,
+				B10000000000000000000013 /* KnowledgePoint.swift */,
+				B10000000000000000000017 /* DailyTask.swift */,
+				B1000000000000000000001B /* WeeklySummary.swift */,
+				B1000000000000000000001C /* Tag.swift */,
+				B1000000000000000000001D /* KnowledgePointImage.swift */,
+				4CAF31EDCD25BB15763F2BFA /* StageNote.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000004 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000000B /* WrongAnswerView.swift */,
+				B1000000000000000000000C /* AddWrongAnswerView.swift */,
+				B10000000000000000000011 /* WrongAnswerDetailView.swift */,
+				B10000000000000000000010 /* ImagePickerView.swift */,
+				B10000000000000000000014 /* KnowledgePointView.swift */,
+				B10000000000000000000015 /* AddKnowledgePointView.swift */,
+				B10000000000000000000016 /* KnowledgePointDetailView.swift */,
+				B10000000000000000000018 /* DailyPlanView.swift */,
+				B10000000000000000000019 /* AddDailyTaskView.swift */,
+				F8676796944E1EAB2452CED9 /* StageNoteView.swift */,
+				E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */,
+				B1000000000000000000001E /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000000E /* study.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000006 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000001A /* DeepSeekService.swift */,
+				B1000000000000000000001F /* DataExportService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10000000000000000000001 /* study */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F20000000000000000000002 /* Build configuration list for PBXNativeTarget "study" */;
+			buildPhases = (
+				E10000000000000000000002 /* Sources */,
+				C10000000000000000000001 /* Frameworks */,
+				E10000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = study;
+			productName = study;
+			productReference = B1000000000000000000000E /* study.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		G10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					E10000000000000000000001 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+				};
+			};
+			buildConfigurationList = F20000000000000000000001 /* Build configuration list for PBXProject "study" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = D10000000000000000000001;
+			productRefGroup = D10000000000000000000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E10000000000000000000001 /* study */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E10000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000000D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E10000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* studyApp.swift in Sources */,
+				A10000000000000000000002 /* ContentView.swift in Sources */,
+				A10000000000000000000003 /* ColorExtension.swift in Sources */,
+				A10000000000000000000006 /* WrongAnswer.swift in Sources */,
+				A1000000000000000000000B /* WrongAnswerView.swift in Sources */,
+				A1000000000000000000000C /* AddWrongAnswerView.swift in Sources */,
+				A10000000000000000000010 /* ImagePickerView.swift in Sources */,
+				A10000000000000000000011 /* WrongAnswerDetailView.swift in Sources */,
+				A10000000000000000000013 /* KnowledgePoint.swift in Sources */,
+				A10000000000000000000014 /* KnowledgePointView.swift in Sources */,
+				A10000000000000000000015 /* AddKnowledgePointView.swift in Sources */,
+				A10000000000000000000016 /* KnowledgePointDetailView.swift in Sources */,
+				A10000000000000000000017 /* DailyTask.swift in Sources */,
+				A10000000000000000000018 /* DailyPlanView.swift in Sources */,
+				A10000000000000000000019 /* AddDailyTaskView.swift in Sources */,
+				A1000000000000000000001A /* DeepSeekService.swift in Sources */,
+				A1000000000000000000001B /* WeeklySummary.swift in Sources */,
+				A1000000000000000000001C /* Tag.swift in Sources */,
+				A1000000000000000000001D /* KnowledgePointImage.swift in Sources */,
+				913A594B3804C9D8A2A2E5F1 /* StageNote.swift in Sources */,
+				9B6A46F3A3DEC5CB8B3A2674 /* StageNoteView.swift in Sources */,
+				799E472BF7F5A8BAACC26DFC /* AddStageNoteView.swift in Sources */,
+				A1000000000000000000001E /* SettingsView.swift in Sources */,
+				A1000000000000000000001F /* DataExportService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		H10000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		H10000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		H10000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 68FGBRKD36;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄错题照片";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.x.study;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		H10000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 68FGBRKD36;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄错题照片";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.x.study;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F20000000000000000000001 /* Build configuration list for PBXProject "study" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				H10000000000000000000001 /* Debug */,
+				H10000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F20000000000000000000002 /* Build configuration list for PBXNativeTarget "study" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				H10000000000000000000003 /* Debug */,
+				H10000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = G10000000000000000000001 /* Project object */;
+}
