@@ -4,8 +4,6 @@ struct KnowledgePointDetailView: View {
     let point: KnowledgePoint
 
     @State private var showEdit = false
-    @State private var showFullScreen = false
-    @State private var fullScreenIndex = 0
 
     var body: some View {
         NavigationStack {
@@ -57,14 +55,14 @@ struct KnowledgePointDetailView: View {
                         Divider().padding(.leading, 12)
                         InfoRow(label: "Record date", value: point.date.formatted(date: .long, time: .omitted))
 
-                        if !point.content.isEmpty {
+                        if !point.displayContent.isEmpty {
                             Divider().padding(.leading, 12)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Content")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .frame(width: 72, alignment: .leading)
-                                Text(point.content)
+                                RichContentView(text: point.displayContent)
                                     .font(.body)
                                     .textSelection(.enabled)
                             }
@@ -78,30 +76,6 @@ struct KnowledgePointDetailView: View {
                             .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
                     )
                     .padding(.horizontal)
-
-                    if !point.images.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Photos (\(point.images.count))")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal)
-
-                            ForEach(Array(point.images.enumerated()), id: \.offset) { idx, img in
-                                if let uiImage = UIImage(data: img.imageData) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        .padding(.horizontal)
-                                        .onTapGesture {
-                                            fullScreenIndex = idx
-                                            showFullScreen = true
-                                        }
-                                }
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
                 }
                 .padding(.vertical)
             }
@@ -115,12 +89,6 @@ struct KnowledgePointDetailView: View {
             }
             .sheet(isPresented: $showEdit) {
                 AddKnowledgePointView(point: point)
-            }
-            .fullScreenCover(isPresented: $showFullScreen) {
-                if fullScreenIndex < point.images.count,
-                   let uiImage = UIImage(data: point.images[fullScreenIndex].imageData) {
-                    ZoomableImageView(uiImage: uiImage, isPresented: $showFullScreen)
-                }
             }
         }
     }

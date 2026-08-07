@@ -37,3 +37,14 @@ extension Color {
         )
     }
 }
+
+extension UIColor {
+    convenience init?(hex: String) {
+        guard let cg = Color(hex: hex).cgColor else { return nil }
+        self.init(cgColor: cg)
+    }
+
+    var hexString: String {
+        Color(self).toHex()
+    }
+}

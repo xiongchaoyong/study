@@ -28,6 +28,24 @@ final class WrongAnswer {
         imageData != nil && imageData!.count > 0
     }
 
+    /// 笔记里是否内嵌了图片（data URI 或富文本 image run）
+    var hasInlineImages: Bool {
+        RichText.containsImage(notes)
+    }
+
+    /// 纯文本版本（用于搜索/导出），图片占位为 [图片]
+    var plainText: String {
+        if RichText.isRich(notes) { return RichText.plainText(from: notes) }
+        if notes.contains("data:image/") { return InlineImageMarkdown.stripped(forPlainText: notes) }
+        return notes
+    }
+
+    /// 用于展示的完整内容：旧的单独存储照片（内嵌为 data URI）+ 笔记
+    var displayContent: String {
+        guard let imageData, !imageData.isEmpty, !notes.contains("data:image/"), !RichText.isRich(notes) else { return notes }
+        return "![image](data:image/jpeg;base64,\(imageData.base64EncodedString()))\n\n" + notes
+    }
+
     init(
         questionNumber: String,
         book: String = "",

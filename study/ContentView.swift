@@ -23,6 +23,16 @@ struct ContentView: View {
                     Label("Stage Notes", systemImage: "scope")
                 }
 
+            ChatView()
+                .tabItem {
+                    Label("聊天", systemImage: "bubble.left.and.bubble.right.fill")
+                }
+
+            NewsView()
+                .tabItem {
+                    Label("资讯", systemImage: "newspaper.fill")
+                }
+
             SettingsView()
                 .tabItem {
                     Label("Backup", systemImage: "gearshape.fill")

@@ -18,7 +18,7 @@ struct KnowledgePointView: View {
         if !searchText.isEmpty {
             result = result.filter {
                 $0.title.localizedCaseInsensitiveContains(searchText) ||
-                $0.content.localizedCaseInsensitiveContains(searchText)
+                $0.plainText.localizedCaseInsensitiveContains(searchText)
             }
         }
         return result
@@ -69,14 +69,14 @@ struct KnowledgePointView: View {
                                     Text(point.date, style: .date)
                                         .font(.caption2)
                                         .foregroundStyle(.tertiary)
-                                    if point.hasImages {
+                                    if point.hasImages || point.hasInlineImages {
                                         Image(systemName: "photo")
                                             .font(.caption2)
                                             .foregroundStyle(.purple)
                                     }
                                 }
-                                if !point.content.isEmpty {
-                                    Text(point.content)
+                                if !point.plainText.isEmpty {
+                                    Text(point.plainText)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                         .lineLimit(2)

@@ -12,7 +12,8 @@ struct AddKnowledgePointView: View {
     @State private var content: String
     @State private var selectedTags: [Tag]
     @State private var date: Date
-    @State private var imageDatas: [Data]
+    @State private var pendingImageData: Data?
+    @State private var pendingFormat: RichFormat?
     @State private var showCamera = false
     @State private var showPhotoLibrary = false
     @State private var showAddTag = false
@@ -22,10 +23,21 @@ struct AddKnowledgePointView: View {
     init(point: KnowledgePoint? = nil) {
         self.point = point
         _title = State(initialValue: point?.title ?? "")
-        _content = State(initialValue: point?.content ?? "")
+        _content = State(initialValue: Self.migratedContent(from: point))
         _selectedTags = State(initialValue: point?.tags ?? [])
         _date = State(initialValue: point?.date ?? Date())
-        _imageDatas = State(initialValue: point?.images.map(\.imageData) ?? [])
+    }
+
+    /// 旧数据：把单独存储的图片迁移进正文（内嵌 data URI）
+    private static func migratedContent(from point: KnowledgePoint?) -> String {
+        guard let point else { return "" }
+        var result = point.content
+        if !point.images.isEmpty, !result.contains("data:image/") {
+            for img in point.images {
+                result += "\n\n![image](data:image/jpeg;base64,\(img.imageData.base64EncodedString()))"
+            }
+        }
+        return result
     }
 
     var isEditing: Bool { point != nil }
@@ -33,21 +45,6 @@ struct AddKnowledgePointView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // MARK: Photos
-                Section("Photos (multiple)") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
-                                if let uiImage = UIImage(data: data) {
-                                    thumbnailView(uiImage, at: idx)
-                                }
-                            }
-                            addPhotoButton
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-
                 // MARK: Title
                 Section("Title") {
                     TextField("e.g. L'Hôpital's rule", text: $title)
@@ -97,8 +94,17 @@ struct AddKnowledgePointView: View {
 
                 // MARK: Content
                 Section("Content (optional)") {
-                    TextField("Record knowledge point content", text: $content, axis: .vertical)
-                        .lineLimit(4...10)
+                    InlineImageTextView(
+                        text: $content,
+                        imageToInsert: pendingImageData,
+                        onImageInserted: { pendingImageData = nil },
+                        pendingFormat: pendingFormat,
+                        onFormatApplied: { pendingFormat = nil },
+                        onFormat: { pendingFormat = $0 },
+                        onCamera: { showCamera = true },
+                        onLibrary: { showPhotoLibrary = true }
+                    )
+                    .frame(minHeight: 120)
                 }
 
                 // MARK: Date
@@ -119,60 +125,18 @@ struct AddKnowledgePointView: View {
             }
             .fullScreenCover(isPresented: $showCamera) {
                 ImagePickerView(sourceType: .camera) { data in
-                    imageDatas.append(data)
+                    pendingImageData = data
                 }
                 .ignoresSafeArea()
             }
             .sheet(isPresented: $showPhotoLibrary) {
                 ImagePickerView(sourceType: .photoLibrary) { data in
-                    imageDatas.append(data)
+                    pendingImageData = data
                 }
             }
             .sheet(isPresented: $showAddTag) {
                 addTagSheet
             }
-        }
-    }
-
-    // MARK: - Thumbnail
-
-    private func thumbnailView(_ uiImage: UIImage, at index: Int) -> some View {
-        Image(uiImage: uiImage)
-            .resizable()
-            .scaledToFill()
-            .frame(width: 72, height: 72)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    imageDatas.remove(at: index)
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.callout)
-                        .foregroundStyle(.white)
-                        .background(Circle().fill(Color.black.opacity(0.5)))
-                }
-                .padding(3)
-            }
-    }
-
-    private var addPhotoButton: some View {
-        Menu {
-            Button { showCamera = true } label: {
-                Label("Take Photo", systemImage: "camera")
-            }
-            Button { showPhotoLibrary = true } label: {
-                Label("Choose from Library", systemImage: "photo.on.rectangle")
-            }
-        } label: {
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
-                .foregroundStyle(.gray.opacity(0.4))
-                .frame(width: 72, height: 72)
-                .overlay {
-                    Image(systemName: "plus")
-                        .font(.title2)
-                        .foregroundStyle(.gray)
-                }
         }
     }
 
@@ -237,21 +201,19 @@ struct AddKnowledgePointView: View {
     private func save() {
         let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
         let trimmedContent = content.trimmingCharacters(in: .whitespaces)
-        let imgs = imageDatas.map { KnowledgePointImage(imageData: $0) }
 
         if let point = point {
             point.title = trimmedTitle
             point.content = trimmedContent
             point.tags = selectedTags
             point.date = date
-            point.images = imgs
+            point.images = []
         } else {
             let newPoint = KnowledgePoint(
                 title: trimmedTitle,
                 content: trimmedContent,
                 date: date,
-                tags: selectedTags,
-                images: imgs
+                tags: selectedTags
             )
             modelContext.insert(newPoint)
         }

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Charts
 
 struct DailyPlanView: View {
     @Environment(\.modelContext) private var modelContext
@@ -18,6 +19,19 @@ struct DailyPlanView: View {
 
     private let calendar = Calendar.current
     private let today = Calendar.current.startOfDay(for: Date())
+
+    /// 固定考研日期：2026-12-20
+    static let examDate: Date = {
+        var comps = DateComponents()
+        comps.year = 2026
+        comps.month = 12
+        comps.day = 20
+        return Calendar.current.startOfDay(for: Calendar.current.date(from: comps) ?? Date())
+    }()
+
+    private var examDaysLeft: Int {
+        max(0, calendar.dateComponents([.day], from: today, to: Self.examDate).day ?? 0)
+    }
 
     init() {
         let t = Calendar.current.startOfDay(for: Date())
@@ -42,6 +56,8 @@ struct DailyPlanView: View {
     private var currentWeekMonday: Date { Self.monday(of: Date()) }
     private var canGoPrev: Bool { weekStart > Self.minWeekStart }
     private var isPastWeek: Bool { weekStart < currentWeekMonday }
+    /// 本周或过往周都可以生成周总结
+    private var canGenerateSummary: Bool { weekStart <= currentWeekMonday }
     private var isPastDate: Bool { selectedDate < today }
 
     private var canGoNext: Bool {
@@ -81,9 +97,37 @@ struct DailyPlanView: View {
         return "\(df.string(from: weekStart))-\(df.string(from: end))"
     }
 
+    // MARK: - 周统计（柱状图数据）
+
+    fileprivate struct DayStat: Identifiable {
+        let label: String
+        let total: Int
+        let done: Int
+        var id: String { label }
+    }
+
+    private var weekStats: [DayStat] {
+        weekDates.map { day in
+            let tasks = allTasks.filter { calendar.isDate($0.date, inSameDayAs: day) }
+            return DayStat(
+                label: dayLabel(day),
+                total: tasks.count,
+                done: tasks.filter(\.isCompleted).count
+            )
+        }
+    }
+
+    private func dayLabel(_ date: Date) -> String {
+        let symbols = ["日", "一", "二", "三", "四", "五", "六"]
+        return "周\(symbols[calendar.component(.weekday, from: date) - 1])"
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // Exam countdown banner
+                examCountdownBanner
+
                 // Swipeable date strip
                 dateStripView
                     .gesture(weekSwipe)
@@ -169,10 +213,13 @@ struct DailyPlanView: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if isPastWeek {
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    if canGenerateSummary {
                         summaryToolbarButton
-                    } else if !isPastDate {
+                    }
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if !isPastDate {
                         Button { showAddTask = true } label: {
                             Image(systemName: "plus")
                         }
@@ -273,6 +320,32 @@ struct DailyPlanView: View {
                 selectedDate = date
             }
         }
+    }
+
+    // MARK: - Exam countdown
+
+    private var examCountdownBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.caption)
+            Text("距离考研还有 \(examDaysLeft) 天")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Spacer()
+            Text(Self.examDate.formatted(date: .numeric, time: .omitted))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .foregroundStyle(Color.lavender)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.lavender.opacity(0.1))
+                .padding(.horizontal, 12)
+        )
+        .padding(.vertical, 6)
     }
 
     // MARK: - Week swipe
@@ -434,32 +507,27 @@ struct DailyPlanView: View {
 
     @ViewBuilder
     private var summaryToolbarButton: some View {
-        if isPastWeek {
+        if canGenerateSummary {
             if let existing = existingSummary {
                 Button {
                     summaryText = existing.content
                     showSummary = true
                 } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sparkles")
-                        Text("Weekly Summary")
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.purple)
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(Color.lavender)
                 }
             } else {
                 Button {
                     summarizeWeek()
                 } label: {
-                    HStack(spacing: 4) {
-                        if isSummarizing {
-                            ProgressView().scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "sparkles")
-                        }
-                        Text("Generate Summary")
+                    if isSummarizing {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(Color.lavender)
+                    } else {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(Color.lavender)
                     }
-                    .font(.subheadline)
                 }
                 .disabled(isSummarizing)
             }
@@ -470,19 +538,29 @@ struct DailyPlanView: View {
 
     private var summarySheet: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 0) {
                 if isSummarizing {
+                    Spacer()
                     VStack(spacing: 20) {
                         ProgressView().scaleEffect(1.5)
-                        Text("Generating summary...")
+                        Text("正在生成周总结...")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Spacer()
                 } else {
-                    MarkdownWebView(markdown: summaryText)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            MarkdownText(markdown: summaryText)
+                                .textSelection(.enabled)
+
+                            WeeklyBarChart(stats: weekStats)
+                        }
+                        .padding()
+                    }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationTitle("\(weekRangeString) Weekly Summary")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -545,98 +623,43 @@ struct DailyPlanView: View {
     }
 }
 
-// MARK: - Markdown WebView
+// MARK: - 每周任务柱状图
 
-import WebKit
+private struct WeeklyBarChart: View {
+    let stats: [DailyPlanView.DayStat]
 
-struct MarkdownWebView: UIViewRepresentable {
-    let markdown: String
+    var body: some View {
+        Chart {
+            ForEach(stats) { day in
+                BarMark(
+                    x: .value("Day", day.label),
+                    y: .value("Count", day.total)
+                )
+                .foregroundStyle(by: .value("Type", "总量"))
+                .cornerRadius(2)
 
-    func makeUIView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        let webView = WKWebView(frame: .zero, configuration: config)
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
-        return webView
-    }
-
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        let html = markdownToHTML(markdown)
-        webView.loadHTMLString(html, baseURL: nil)
-    }
-
-    private func markdownToHTML(_ md: String) -> String {
-        let attr: NSAttributedString
-        if let parsed = try? AttributedString(
-            markdown: md,
-            options: AttributedString.MarkdownParsingOptions(
-                allowsExtendedAttributes: true,
-                interpretedSyntax: .full
-            )
-        ) {
-            attr = NSAttributedString(parsed)
-        } else {
-            attr = NSAttributedString(string: md)
+                BarMark(
+                    x: .value("Day", day.label),
+                    y: .value("Count", day.done)
+                )
+                .foregroundStyle(by: .value("Type", "完成"))
+                .cornerRadius(2)
+            }
         }
-
-        let htmlData: Data
-        do {
-            htmlData = try attr.data(
-                from: NSRange(location: 0, length: attr.length),
-                documentAttributes: [
-                    .documentType: NSAttributedString.DocumentType.html,
-                    .characterEncoding: String.Encoding.utf8.rawValue,
-                ]
-            )
-        } catch {
-            htmlData = Data("<pre>\(md)</pre>".utf8)
+        .chartForegroundStyleScale([
+            "总量": Color.gray.opacity(0.35),
+            "完成": Color.lavender
+        ])
+        .chartLegend(position: .bottom, spacing: 8)
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 4))
         }
-
-        guard var htmlString = String(data: htmlData, encoding: .utf8) else {
-            return "<pre>\(md)</pre>"
+        .frame(height: 170)
+        .chartPlotStyle { plotArea in
+            plotArea
+                .background(Color(.secondarySystemBackground).opacity(0.4))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-
-        let css = """
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <style>
-        :root { color-scheme: light dark; }
-        body {
-            font-family: -apple-system, 'PingFang SC', sans-serif;
-            font-size: 22px;
-            font-weight: 600;
-            line-height: 1.8;
-            padding: 20px;
-            margin: 0;
-            color: #1c1c1e;
-        }
-        @media (prefers-color-scheme: dark) {
-            body { color: #e5e5ea; background: transparent; }
-        }
-        h1, h2, h3 { margin-top: 1.2em; margin-bottom: 0.5em; }
-        p { margin: 0.6em 0; }
-        ul, ol { padding-left: 1.5em; margin: 0.6em 0; }
-        li { margin: 0.3em 0; }
-        blockquote {
-            border-left: 3px solid #8e8e93;
-            padding-left: 12px;
-            margin: 0.5em 0;
-            color: #636366;
-        }
-        @media (prefers-color-scheme: dark) { blockquote { color: #aeaeb2; } }
-        code {
-            font-family: 'SF Mono', monospace;
-            font-size: 0.9em;
-            background: #f2f2f7;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        @media (prefers-color-scheme: dark) { code { background: #2c2c2e; } }
-        hr { border: none; border-top: 1px solid #d1d1d6; margin: 1em 0; }
-        </style>
-        """
-
-        htmlString = htmlString.replacingOccurrences(of: "<head>", with: "<head>\n\(css)")
-        return htmlString
     }
 }
+

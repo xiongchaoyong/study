@@ -32,6 +32,10 @@
 		799E472BF7F5A8BAACC26DFC /* AddStageNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */; };
 		A1000000000000000000001E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001E /* SettingsView.swift */; };
 		A1000000000000000000001F /* DataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001F /* DataExportService.swift */; };
+		A10000000000000000000020 /* HotSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000020 /* HotSearchService.swift */; };
+		A10000000000000000000021 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* ChatView.swift */; };
+		A10000000000000000000022 /* NewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* NewsView.swift */; };
+		A10000000000000000000024 /* MarkdownText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000024 /* MarkdownText.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +65,10 @@
 		E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStageNoteView.swift; sourceTree = "<group>"; };
 		B1000000000000000000001E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B1000000000000000000001F /* DataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExportService.swift; sourceTree = "<group>"; };
+		B10000000000000000000020 /* HotSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotSearchService.swift; sourceTree = "<group>"; };
+		B10000000000000000000021 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		B10000000000000000000022 /* NewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000024 /* MarkdownText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownText.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +133,9 @@
 				F8676796944E1EAB2452CED9 /* StageNoteView.swift */,
 				E04B17A827CDC8C6A3B5316D /* AddStageNoteView.swift */,
 				B1000000000000000000001E /* SettingsView.swift */,
+				B10000000000000000000021 /* ChatView.swift */,
+				B10000000000000000000022 /* NewsView.swift */,
+				B10000000000000000000024 /* MarkdownText.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -142,6 +153,7 @@
 			children = (
 				B1000000000000000000001A /* DeepSeekService.swift */,
 				B1000000000000000000001F /* DataExportService.swift */,
+				B10000000000000000000020 /* HotSearchService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -240,6 +252,10 @@
 				799E472BF7F5A8BAACC26DFC /* AddStageNoteView.swift in Sources */,
 				A1000000000000000000001E /* SettingsView.swift in Sources */,
 				A1000000000000000000001F /* DataExportService.swift in Sources */,
+				A10000000000000000000020 /* HotSearchService.swift in Sources */,
+				A10000000000000000000021 /* ChatView.swift in Sources */,
+				A10000000000000000000022 /* NewsView.swift in Sources */,
+				A10000000000000000000024 /* MarkdownText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

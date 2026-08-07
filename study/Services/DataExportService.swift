@@ -461,7 +461,7 @@ enum DataExportService {
                     var detail = "Date: \(displayFormatter.string(from: answer.date))"
                     if !answer.problemType.isEmpty { detail += " | \(answer.problemType)" }
                     if !answer.tags.isEmpty { detail += " | Tags: \(answer.tags.joined(separator: ", "))" }
-                    if !answer.notes.isEmpty { detail += " | \(answer.notes)" }
+                    if !answer.notes.isEmpty { detail += " | \(RichText.exportText(from: answer.notes))" }
                     drawText(detail, font: smallFont, color: .darkGray)
                     y += 2
                 }
@@ -484,7 +484,7 @@ enum DataExportService {
                     }
                     drawText(detail, font: smallFont, color: .darkGray)
                     if !point.content.isEmpty {
-                        drawText(point.content, font: smallFont, color: .darkGray)
+                        drawText(RichText.exportText(from: point.content), font: smallFont, color: .darkGray)
                     }
                     if !point.images.isEmpty {
                         drawText("Photos: \(point.images.count) attached", font: smallFont, color: .gray)

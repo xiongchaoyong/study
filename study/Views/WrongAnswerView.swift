@@ -213,7 +213,7 @@ struct WrongAnswerView: View {
                                 Text("No. \(answer.questionNumber)").font(.headline)
                                 Spacer()
                                 Text(answer.date, style: .date).font(.caption2).foregroundStyle(.tertiary)
-                                if answer.hasImage {
+                                if answer.hasImage || answer.hasInlineImages {
                                     Image(systemName: "photo").font(.caption2).foregroundStyle(Color.lavender)
                                 }
                             }

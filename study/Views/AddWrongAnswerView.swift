@@ -13,9 +13,10 @@ struct AddWrongAnswerView: View {
     @State private var customTag = ""
     @State private var date = Date()
     @State private var notes = ""
-    @State private var imageData: Data?
-    @State private var showImagePicker = false
-    @State private var imageSourceType: ImagePickerView.SourceType = .camera
+    @State private var pendingImageData: Data?
+    @State private var pendingFormat: RichFormat?
+    @State private var showCamera = false
+    @State private var showPhotoLibrary = false
     @State private var didLoadEdit = false
 
     var isEditing: Bool { editAnswer != nil }
@@ -43,49 +44,6 @@ struct AddWrongAnswerView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    if let imageData = imageData, let uiImage = UIImage(data: imageData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxHeight: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Spacer()
-                        Menu {
-                            Button {
-                                imageSourceType = .camera
-                                showImagePicker = true
-                            } label: {
-                                Label("Take Photo", systemImage: "camera.fill")
-                            }
-                            Button {
-                                imageSourceType = .photoLibrary
-                                showImagePicker = true
-                            } label: {
-                                Label("Choose from Library", systemImage: "photo.on.rectangle")
-                            }
-                        } label: {
-                            Label("Take Photo", systemImage: "camera.fill")
-                                .font(.subheadline)
-                                .frame(maxWidth: .infinity)
-                        }
-                        Spacer()
-                    }
-                    .overlay(alignment: .trailing) {
-                        if imageData != nil {
-                            Button(role: .destructive) {
-                                imageData = nil
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.subheadline)
-                            }
-                        }
-                    }
-                }
-
                 Section("Book") {
                     HStack {
                         TextField("e.g. Calculus 1000, 30 Lectures", text: $book)
@@ -165,8 +123,17 @@ struct AddWrongAnswerView: View {
                 }
 
                 Section("Notes (Optional)") {
-                    TextField("Notes", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
+                    InlineImageTextView(
+                        text: $notes,
+                        imageToInsert: pendingImageData,
+                        onImageInserted: { pendingImageData = nil },
+                        pendingFormat: pendingFormat,
+                        onFormatApplied: { pendingFormat = nil },
+                        onFormat: { pendingFormat = $0 },
+                        onCamera: { showCamera = true },
+                        onLibrary: { showPhotoLibrary = true }
+                    )
+                    .frame(minHeight: 90)
                 }
             }
             .navigationTitle(isEditing ? "Edit Mistake" : "Add Mistake")
@@ -177,8 +144,12 @@ struct AddWrongAnswerView: View {
                 book = answer.book
                 selectedTags = Set(answer.tags)
                 date = answer.date
-                notes = answer.notes
-                imageData = answer.imageData
+                // 旧数据：把单独存储的错题照片迁移进笔记（内嵌 data URI）
+                var migrated = answer.notes
+                if let imageData = answer.imageData, !migrated.contains("data:image/") {
+                    migrated = "![image](data:image/jpeg;base64,\(imageData.base64EncodedString()))\n\n" + migrated
+                }
+                notes = migrated
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -190,31 +161,38 @@ struct AddWrongAnswerView: View {
                     }
                 }
             }
-            .fullScreenCover(isPresented: $showImagePicker) {
-                ImagePickerView(sourceType: imageSourceType) { data in
-                    imageData = data
+            .fullScreenCover(isPresented: $showCamera) {
+                ImagePickerView(sourceType: .camera) { data in
+                    pendingImageData = data
                 }
                 .ignoresSafeArea()
+            }
+            .sheet(isPresented: $showPhotoLibrary) {
+                ImagePickerView(sourceType: .photoLibrary) { data in
+                    pendingImageData = data
+                }
             }
         }
     }
 
     private func saveAnswer() {
+        let trimmedNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
         if let existing = editAnswer {
             existing.book = book.trimmingCharacters(in: .whitespaces)
             existing.tags = Array(selectedTags)
             existing.date = date
-            existing.notes = notes.trimmingCharacters(in: .whitespaces)
-            existing.imageData = imageData
+            existing.notes = trimmedNotes
+            // 图片已迁移进笔记，清除旧的单独存储，避免重复
+            existing.imageData = nil
         } else {
             let answer = WrongAnswer(
                 questionNumber: "",
                 book: book.trimmingCharacters(in: .whitespaces),
                 problemType: "",
                 tags: Array(selectedTags),
-                imageData: imageData,
+                imageData: nil,
                 date: date,
-                notes: notes.trimmingCharacters(in: .whitespaces)
+                notes: trimmedNotes
             )
             modelContext.insert(answer)
         }

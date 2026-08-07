@@ -4,7 +4,6 @@ import SwiftData
 struct WrongAnswerDetailView: View {
     let answer: WrongAnswer
 
-    @State private var showFullScreen = false
     @State private var showEdit = false
 
     var body: some View {
@@ -45,15 +44,16 @@ struct WrongAnswerDetailView: View {
                         }
                         Divider().padding(.leading, 12)
                         InfoRow(label: "Date", value: answer.date.formatted(date: .long, time: .omitted))
-                        if !answer.notes.isEmpty {
+                        if !answer.displayContent.isEmpty {
                             Divider().padding(.leading, 12)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Notes")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .frame(width: 72, alignment: .leading)
-                                Text(answer.notes)
+                                RichContentView(text: answer.displayContent)
                                     .font(.body)
+                                    .textSelection(.enabled)
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 10)
@@ -65,24 +65,6 @@ struct WrongAnswerDetailView: View {
                             .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
                     )
                     .padding(.horizontal)
-
-                    // Image (static in detail, tap for full-screen editing)
-                    if let imageData = answer.imageData, let uiImage = UIImage(data: imageData) {
-                        VStack(spacing: 6) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .onTapGesture {
-                                    showFullScreen = true
-                                }
-                                .padding(.horizontal)
-
-                            Text("Tap image for full-screen editing (zoom / rotate / drag)")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
                 }
                 .padding(.vertical)
             }
@@ -100,11 +82,6 @@ struct WrongAnswerDetailView: View {
             }
             .sheet(isPresented: $showEdit) {
                 AddWrongAnswerView(editAnswer: answer)
-            }
-            .fullScreenCover(isPresented: $showFullScreen) {
-                if let imageData = answer.imageData, let uiImage = UIImage(data: imageData) {
-                    ZoomableImageView(uiImage: uiImage, isPresented: $showFullScreen)
-                }
             }
         }
     }
@@ -131,108 +108,5 @@ struct InfoRow: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-    }
-}
-
-struct ZoomableImageView: View {
-    let uiImage: UIImage
-    @Binding var isPresented: Bool
-
-    @State private var scale: CGFloat = 1.0
-    @State private var lastScale: CGFloat = 1.0
-    @State private var rotation: Angle = .zero
-    @State private var lastRotation: Angle = .zero
-    @State private var offset: CGSize = .zero
-    @State private var lastOffset: CGSize = .zero
-
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            GeometryReader { geometry in
-                let containerSize = geometry.size
-                let displaySize = fittedSize(for: uiImage, in: containerSize)
-
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .scaleEffect(scale)
-                    .rotationEffect(rotation)
-                    .offset(offset)
-                    .gesture(
-                        MagnificationGesture()
-                            .onChanged { value in scale = lastScale * value }
-                            .onEnded { _ in lastScale = scale }
-                    )
-                    .simultaneousGesture(
-                        RotationGesture()
-                            .onChanged { angle in rotation = lastRotation + angle }
-                            .onEnded { _ in lastRotation = rotation }
-                    )
-                    .simultaneousGesture(
-                        DragGesture()
-                            .onChanged { value in
-                                let newOffset = CGSize(
-                                    width: lastOffset.width + value.translation.width,
-                                    height: lastOffset.height + value.translation.height
-                                )
-                                offset = clamped(newOffset, displaySize: displaySize, container: containerSize)
-                            }
-                            .onEnded { _ in
-                                lastOffset = clamped(offset, displaySize: displaySize, container: containerSize)
-                                offset = lastOffset
-                            }
-                    )
-                    .onTapGesture(count: 2) {
-                        withAnimation(.spring()) {
-                            scale = 1; lastScale = 1
-                            rotation = .zero; lastRotation = .zero
-                            offset = .zero; lastOffset = .zero
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .overlay(alignment: .topTrailing) {
-            Button {
-                isPresented = false
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title)
-                    .foregroundStyle(.white)
-                    .padding()
-            }
-        }
-        .statusBarHidden()
-    }
-
-    /// Calculate the displayed image size after scaledToFit
-    private func fittedSize(for image: UIImage, in container: CGSize) -> CGSize {
-        guard container.width > 0, container.height > 0 else { return container }
-        let imageAspect = image.size.width / image.size.height
-        let containerAspect = container.width / container.height
-
-        if imageAspect > containerAspect {
-            let width = container.width
-            return CGSize(width: width, height: width / imageAspect)
-        } else {
-            let height = container.height
-            return CGSize(width: height * imageAspect, height: height)
-        }
-    }
-
-    /// Clamp offset so at least 50pt of the image stays visible
-    private func clamped(_ offset: CGSize, displaySize: CGSize, container: CGSize) -> CGSize {
-        let scaledW = displaySize.width * scale
-        let scaledH = displaySize.height * scale
-        let minVisible: CGFloat = 50
-
-        let maxX = max(0, (scaledW - container.width) / 2 + minVisible)
-        let maxY = max(0, (scaledH - container.height) / 2 + minVisible)
-
-        return CGSize(
-            width: min(max(offset.width, -maxX), maxX),
-            height: min(max(offset.height, -maxY), maxY)
-        )
     }
 }
