@@ -7,6 +7,10 @@ struct StudyApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [Tag.self, KnowledgePointImage.self, KnowledgePoint.self, WrongAnswer.self, DailyTask.self, WeeklySummary.self, StageNote.self])
+        .modelContainer(for: [
+            Tag.self, KnowledgePointImage.self, KnowledgePoint.self,
+            WrongAnswer.self, DailyTask.self, WeeklySummary.self,
+            StageNote.self, ChatMessage.self, Expression.self, PracticeMessage.self
+        ])
     }
 }

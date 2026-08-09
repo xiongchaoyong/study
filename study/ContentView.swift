@@ -23,6 +23,11 @@ struct ContentView: View {
                     Label("Stage Notes", systemImage: "scope")
                 }
 
+            ExpressionTabView()
+                .tabItem {
+                    Label("表达", systemImage: "text.bubble.fill")
+                }
+
             ChatView()
                 .tabItem {
                     Label("聊天", systemImage: "bubble.left.and.bubble.right.fill")

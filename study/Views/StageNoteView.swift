@@ -6,7 +6,6 @@ struct StageNoteView: View {
     @Query(sort: \StageNote.createdAt, order: .reverse) private var notes: [StageNote]
 
     @State private var showAdd = false
-    @State private var editNote: StageNote?
     @State private var selectedType: StageNoteType = .outline
 
     var filteredNotes: [StageNote] {
@@ -52,7 +51,9 @@ struct StageNoteView: View {
                         ForEach(outlineGroups, id: \.subject) { group in
                             Section {
                                 ForEach(group.notes) { note in
-                                    Button { editNote = note } label: {
+                                    NavigationLink {
+                                        StageNoteDetailView(note: note)
+                                    } label: {
                                         noteRow(note)
                                     }
                                 }
@@ -72,8 +73,8 @@ struct StageNoteView: View {
                 } else {
                     List {
                         ForEach(filteredNotes) { note in
-                            Button {
-                                editNote = note
+                            NavigationLink {
+                                StageNoteDetailView(note: note)
                             } label: {
                                 noteRow(note)
                             }
@@ -98,9 +99,6 @@ struct StageNoteView: View {
             }
             .sheet(isPresented: $showAdd) {
                 AddStageNoteView()
-            }
-            .sheet(item: $editNote) { note in
-                AddStageNoteView(editNote: note)
             }
         }
     }
@@ -144,10 +142,6 @@ struct StageNoteView: View {
             }
 
             Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
         }
         .padding(.vertical, 4)
     }

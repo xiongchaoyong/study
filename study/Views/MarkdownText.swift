@@ -28,6 +28,7 @@ struct MarkdownText: View {
         case callout(kind: CalloutKind, label: String, text: String)
         case code(String)
         case divider
+        case table(headers: [String], rows: [[String]])
     }
 
     /// 解析出的提示框：类型 + 自定义标题（如 "> [!NOTE 本周概览]"）
@@ -92,6 +93,34 @@ struct MarkdownText: View {
         }
     }
 
+    /// 拆一个表格行为单元格，去掉首尾空白的 pipe
+    private func parseTableRow(_ trimmed: String) -> [String] {
+        var s = trimmed
+        if s.hasPrefix("|") { s = String(s.dropFirst()) }
+        if s.hasSuffix("|") { s = String(s.dropLast()) }
+        return s.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
+    /// 是否为表格分隔行（如 |---|----|）
+    private func isTableSeparator(_ trimmed: String) -> Bool {
+        guard trimmed.contains("|") else { return false }
+        let cells = parseTableRow(trimmed)
+        guard !cells.isEmpty else { return false }
+        return cells.allSatisfy { cell in
+            let cleaned = cell.replacingOccurrences(of: "-", with: "")
+                .replacingOccurrences(of: ":", with: "")
+                .trimmingCharacters(in: .whitespaces)
+            return cleaned.isEmpty
+        }
+    }
+
+    /// 是否为表数据行（至少两个 pipe，且不是分隔行）
+    private func isTableRow(_ trimmed: String) -> Bool {
+        guard trimmed.contains("|"), !isTableSeparator(trimmed) else { return false }
+        let cells = parseTableRow(trimmed)
+        return cells.count >= 2
+    }
+
     private var blocks: [Block] {
         var result: [Block] = []
         var paragraphLines: [String] = []
@@ -99,6 +128,7 @@ struct MarkdownText: View {
         var codeLines: [String] = []
         var quoteLines: [String] = []
         var quoteMarker: CalloutMarker?
+        var tableLines: [String] = []
 
         func flushParagraph() {
             guard !paragraphLines.isEmpty else { return }
@@ -118,7 +148,23 @@ struct MarkdownText: View {
             quoteMarker = nil
         }
 
-        for line in markdown.components(separatedBy: "\n") {
+        func flushTable() {
+            guard tableLines.count >= 2 else {
+                // Not enough lines for a valid table, treat as paragraphs
+                for line in tableLines { result.append(.paragraph(line)) }
+                tableLines = []
+                return
+            }
+            let headers = parseTableRow(tableLines[0])
+            let rows = tableLines.dropFirst().map { parseTableRow($0) }
+            result.append(.table(headers: headers, rows: rows))
+            tableLines = []
+        }
+
+        let lines = markdown.components(separatedBy: "\n")
+        var idx = 0
+        while idx < lines.count {
+            let line = lines[idx]
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
             // 代码块
@@ -127,34 +173,72 @@ struct MarkdownText: View {
                     result.append(.code(codeLines.joined(separator: "\n")))
                     codeLines = []
                     inCode = false
-                } else {
-                    codeLines.append(line)
+                    idx += 1; continue
                 }
-                continue
+                codeLines.append(line)
+                idx += 1; continue
             }
             if trimmed.hasPrefix("```") {
                 flushParagraph()
                 flushQuote()
+                flushTable()
                 inCode = true
-                continue
+                idx += 1; continue
             }
 
-            // 引用 / 彩色提示框（> [!NOTE] 或 > [!NOTE 自定义标题] 等）
+            // 引用
             if trimmed == ">" || trimmed.hasPrefix("> ") {
                 let body = trimmed == ">" ? "" : String(trimmed.dropFirst(2))
                 if quoteMarker == nil, let marker = CalloutKind.marker(from: body) {
                     flushParagraph()
+                    flushTable()
                     quoteMarker = marker
                 } else {
                     quoteLines.append(body)
                 }
-                continue
+                idx += 1; continue
             }
             flushQuote()
 
             if trimmed.isEmpty {
                 flushParagraph()
-                continue
+                flushTable()
+                idx += 1; continue
+            }
+
+            // 表格：连续两行以上、首行为表头、第二行为分隔行
+            if isTableRow(trimmed) {
+                if tableLines.isEmpty {
+                    flushParagraph()
+                    flushQuote()
+                }
+                tableLines.append(trimmed)
+                // 如果下一行是分隔行，继续收集
+                if tableLines.count == 1, idx + 1 < lines.count {
+                    let nextTrimmed = lines[idx + 1].trimmingCharacters(in: .whitespaces)
+                    if isTableSeparator(nextTrimmed) {
+                        tableLines.append(nextTrimmed)
+                        idx += 2
+                        // 继续收集数据行
+                        while idx < lines.count {
+                            let nextLine = lines[idx].trimmingCharacters(in: .whitespaces)
+                            if isTableRow(nextLine) {
+                                tableLines.append(nextLine)
+                                idx += 1
+                            } else if nextLine.hasPrefix("|") && isTableSeparator(nextLine) {
+                                // 跳过表内分隔行（某些格式重复表头分隔）
+                                idx += 1
+                            } else {
+                                break
+                            }
+                        }
+                        flushTable()
+                        continue
+                    }
+                }
+                // 单行不够形成表，落到 paragraph
+                paragraphLines.append(trimmed)
+                idx += 1; continue
             }
 
             // 标题
@@ -163,23 +247,26 @@ struct MarkdownText: View {
                 let after = trimmed[trimmed.index(trimmed.startIndex, offsetBy: hashCount)]
                 if after == " " {
                     flushParagraph()
+                    flushTable()
                     result.append(.heading(level: hashCount, text: String(trimmed.dropFirst(hashCount + 1))))
-                    continue
+                    idx += 1; continue
                 }
             }
 
             // 分隔线
             if trimmed == "---" || trimmed == "***" || trimmed == "___" {
                 flushParagraph()
+                flushTable()
                 result.append(.divider)
-                continue
+                idx += 1; continue
             }
 
             // 无序列表
             if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") || trimmed.hasPrefix("+ ") {
                 flushParagraph()
+                flushTable()
                 result.append(.bullet(String(trimmed.dropFirst(2))))
-                continue
+                idx += 1; continue
             }
 
             // 有序列表
@@ -187,17 +274,20 @@ struct MarkdownText: View {
                 let matched = String(trimmed[range])
                 let numStr = matched.prefix(while: { $0.isNumber })
                 flushParagraph()
+                flushTable()
                 result.append(.numbered(index: Int(numStr) ?? 0, text: String(trimmed[range.upperBound...])))
-                continue
+                idx += 1; continue
             }
 
             paragraphLines.append(trimmed)
+            idx += 1
         }
 
         if inCode {
             result.append(.code(codeLines.joined(separator: "\n")))
         }
         flushQuote()
+        flushTable()
         flushParagraph()
         return result
     }
@@ -242,9 +332,55 @@ struct MarkdownText: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.secondarySystemBackground).opacity(0.6))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+        case .table(let headers, let rows):
+            tableView(headers: headers, rows: rows)
         case .divider:
             Divider()
         }
+    }
+
+    @ViewBuilder
+    private func tableView(headers: [String], rows: [[String]]) -> some View {
+        VStack(spacing: 0) {
+            // Header row
+            HStack(spacing: 0) {
+                ForEach(Array(headers.enumerated()), id: \.offset) { _, header in
+                    inline(header)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.lavender.opacity(0.7))
+                }
+            }
+
+            // Data rows
+            ForEach(Array(rows.enumerated()), id: \.offset) { rowIdx, row in
+                let cells = row.count < headers.count
+                    ? row + Array(repeating: "", count: headers.count - row.count)
+                    : Array(row.prefix(headers.count))
+                HStack(spacing: 0) {
+                    ForEach(Array(cells.enumerated()), id: \.offset) { _, cell in
+                        inline(cell)
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(rowIdx % 2 == 0 ? Color(.systemBackground) : Color(.secondarySystemBackground).opacity(0.4))
+                    }
+                }
+                if rowIdx < rows.count - 1 {
+                    Divider().opacity(0.3)
+                }
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.lavender.opacity(0.3), lineWidth: 1)
+        )
     }
 
     private func calloutView(kind: CalloutKind, label: String, text: String) -> some View {

@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct ChatEntry: Identifiable, Equatable {
     enum Role: Equatable {
@@ -17,11 +18,16 @@ struct ChatEntry: Identifiable, Equatable {
 }
 
 struct ChatView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \ChatMessage.createdAt) private var savedMessages: [ChatMessage]
+    @Query(sort: \Expression.createdAt) private var expressions: [Expression]
+
     @State private var messages: [ChatEntry] = []
     @State private var inputText = ""
     @State private var isLoading = false
     @State private var scrollTarget: UUID?
     @State private var streamingTask: Task<Void, Never>?
+    @State private var didLoadHistory = false
     @FocusState private var isInputFocused: Bool
 
     var body: some View {
@@ -49,8 +55,8 @@ struct ChatView: View {
             inputBar
         }
         .background(Color.lavender.opacity(0.35))
+        .onAppear { loadHistory() }
         .onDisappear {
-            // 切走 tab 时取消流式回复，避免后台持续更新导致卡顿
             streamingTask?.cancel()
         }
     }
@@ -116,7 +122,6 @@ struct ChatView: View {
 
             Group {
                 if entry.role == .assistant && entry.content.isEmpty && isLoading {
-                    // 正在生成回复
                     HStack(spacing: 4) {
                         ProgressView()
                             .controlSize(.small)
@@ -155,11 +160,43 @@ struct ChatView: View {
         }
     }
 
+    // MARK: - History
+
+    private func loadHistory() {
+        guard !didLoadHistory else { return }
+        didLoadHistory = true
+        messages = savedMessages.map { msg in
+            let role: ChatEntry.Role = {
+                switch msg.role {
+                case "user": return .user
+                case "assistant": return .assistant
+                case "error": return .error
+                default: return .assistant
+                }
+            }()
+            return ChatEntry(id: UUID(), role: role, content: msg.content)
+        }
+    }
+
+    private func buildSystemPrompt() -> String {
+        var prompt = "你是一个温暖、简洁的通用学习助手，尤其擅长帮助用户学习计算机考研（408）相关知识。"
+
+        if !expressions.isEmpty {
+            let grouped = Dictionary(grouping: expressions) { $0.category.rawValue }
+            prompt += "你可以参考以下句式来丰富回答的表达方式，使回答更有条理和说服力：\n"
+            for (cat, items) in grouped.sorted(by: { $0.key < $1.key }) {
+                let samples = items.prefix(3).map { "  - \($0.text)" }.joined(separator: "\n")
+                prompt += "【\(cat)】\n\(samples)\n"
+            }
+        }
+
+        return prompt
+    }
+
     // MARK: - Send
 
     private func scrollToLast(_ proxy: ScrollViewProxy) {
         guard let last = messages.last else { return }
-        // 流式输出时逐段滚动不带动画，避免频繁动画导致卡顿
         withAnimation(isLoading ? nil : .easeOut(duration: 0.2)) {
             proxy.scrollTo(last.id, anchor: .bottom)
         }
@@ -170,6 +207,9 @@ struct ChatView: View {
         guard !text.isEmpty, !isLoading else { return }
 
         messages.append(ChatEntry(role: .user, content: text))
+        modelContext.insert(ChatMessage(role: "user", content: text))
+        try? modelContext.save()
+
         inputText = ""
         isLoading = true
         isInputFocused = false
@@ -178,7 +218,6 @@ struct ChatView: View {
             .filter { $0.role == .user || $0.role == .assistant }
             .map { DeepSeekService.Message(role: $0.role == .user ? "user" : "assistant", content: $0.content) }
 
-        // 先占位一个空的气泡，后续流式内容逐段写入
         let assistantID = UUID()
         messages.append(ChatEntry(id: assistantID, role: .assistant, content: ""))
 
@@ -186,7 +225,7 @@ struct ChatView: View {
         streamingTask = Task {
             defer { streamingTask = nil }
             do {
-                let stream = DeepSeekService.streamChat(messages: history)
+                let stream = DeepSeekService.streamChat(messages: history, systemPrompt: buildSystemPrompt())
                 for try await chunk in stream {
                     await MainActor.run {
                         if let idx = messages.firstIndex(where: { $0.id == assistantID }) {
@@ -194,16 +233,26 @@ struct ChatView: View {
                         }
                     }
                 }
-                await MainActor.run { isLoading = false }
+                await MainActor.run {
+                    isLoading = false
+                    // Save completed assistant response
+                    if let idx = messages.firstIndex(where: { $0.id == assistantID }) {
+                        modelContext.insert(ChatMessage(role: "assistant", content: messages[idx].content))
+                        try? modelContext.save()
+                    }
+                }
             } catch {
                 await MainActor.run {
                     isLoading = false
+                    let errorContent = "请求失败：\(error.localizedDescription)"
                     if let idx = messages.firstIndex(where: { $0.id == assistantID }) {
                         messages[idx].role = .error
-                        messages[idx].content = "请求失败：\(error.localizedDescription)"
+                        messages[idx].content = errorContent
                     } else {
-                        messages.append(ChatEntry(role: .error, content: "请求失败：\(error.localizedDescription)"))
+                        messages.append(ChatEntry(role: .error, content: errorContent))
                     }
+                    modelContext.insert(ChatMessage(role: "error", content: errorContent))
+                    try? modelContext.save()
                 }
             }
         }

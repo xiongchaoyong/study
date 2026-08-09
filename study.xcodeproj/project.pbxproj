@@ -36,6 +36,18 @@
 		A10000000000000000000021 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* ChatView.swift */; };
 		A10000000000000000000022 /* NewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* NewsView.swift */; };
 		A10000000000000000000024 /* MarkdownText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000024 /* MarkdownText.swift */; };
+
+		A10000000000000000000025 /* DailyTaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000025 /* DailyTaskDetailView.swift */; };
+		A10000000000000000000026 /* StageNoteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000026 /* StageNoteDetailView.swift */; };
+		A10000000000000000000027 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000027 /* ChatMessage.swift */; };
+		A10000000000000000000028 /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000028 /* Expression.swift */; };
+		A10000000000000000000029 /* ExpressionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000029 /* ExpressionListView.swift */; };
+		A10000000000000000000030 /* ExpressionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000030 /* ExpressionDetailView.swift */; };
+		A10000000000000000000031 /* AddExpressionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000031 /* AddExpressionView.swift */; };
+		A10000000000000000000032 /* ExpressionPracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000032 /* ExpressionPracticeView.swift */; };
+		A10000000000000000000033 /* ExpressionTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000033 /* ExpressionTabView.swift */; };
+		A10000000000000000000036 /* ZoomableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000036 /* ZoomableScrollView.swift */; };
+		A10000000000000000000035 /* PracticeMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000035 /* PracticeMessage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +81,17 @@
 		B10000000000000000000021 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		B10000000000000000000022 /* NewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsView.swift; sourceTree = "<group>"; };
 		B10000000000000000000024 /* MarkdownText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownText.swift; sourceTree = "<group>"; };
+		B10000000000000000000025 /* DailyTaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTaskDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000026 /* StageNoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageNoteDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000027 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
+		B10000000000000000000028 /* Expression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expression.swift; sourceTree = "<group>"; };
+		B10000000000000000000029 /* ExpressionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionListView.swift; sourceTree = "<group>"; };
+		B10000000000000000000030 /* ExpressionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000031 /* AddExpressionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpressionView.swift; sourceTree = "<group>"; };
+		B10000000000000000000032 /* ExpressionPracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionPracticeView.swift; sourceTree = "<group>"; };
+		B10000000000000000000033 /* ExpressionTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionTabView.swift; sourceTree = "<group>"; };
+		B10000000000000000000036 /* ZoomableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableScrollView.swift; sourceTree = "<group>"; };
+		B10000000000000000000035 /* PracticeMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeMessage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +137,9 @@
 				B1000000000000000000001C /* Tag.swift */,
 				B1000000000000000000001D /* KnowledgePointImage.swift */,
 				4CAF31EDCD25BB15763F2BFA /* StageNote.swift */,
+				B10000000000000000000027 /* ChatMessage.swift */,
+				B10000000000000000000028 /* Expression.swift */,
+				B10000000000000000000035 /* PracticeMessage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -136,6 +162,14 @@
 				B10000000000000000000021 /* ChatView.swift */,
 				B10000000000000000000022 /* NewsView.swift */,
 				B10000000000000000000024 /* MarkdownText.swift */,
+				B10000000000000000000025 /* DailyTaskDetailView.swift */,
+				B10000000000000000000026 /* StageNoteDetailView.swift */,
+				B10000000000000000000029 /* ExpressionListView.swift */,
+				B10000000000000000000030 /* ExpressionDetailView.swift */,
+				B10000000000000000000031 /* AddExpressionView.swift */,
+				B10000000000000000000032 /* ExpressionPracticeView.swift */,
+				B10000000000000000000033 /* ExpressionTabView.swift */,
+				B10000000000000000000036 /* ZoomableScrollView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -256,6 +290,17 @@
 				A10000000000000000000021 /* ChatView.swift in Sources */,
 				A10000000000000000000022 /* NewsView.swift in Sources */,
 				A10000000000000000000024 /* MarkdownText.swift in Sources */,
+			A10000000000000000000025 /* DailyTaskDetailView.swift in Sources */,
+			A10000000000000000000026 /* StageNoteDetailView.swift in Sources */,
+			A10000000000000000000027 /* ChatMessage.swift in Sources */,
+			A10000000000000000000028 /* Expression.swift in Sources */,
+			A10000000000000000000029 /* ExpressionListView.swift in Sources */,
+			A10000000000000000000030 /* ExpressionDetailView.swift in Sources */,
+			A10000000000000000000031 /* AddExpressionView.swift in Sources */,
+			A10000000000000000000032 /* ExpressionPracticeView.swift in Sources */,
+			A10000000000000000000033 /* ExpressionTabView.swift in Sources */,
+			A10000000000000000000036 /* ZoomableScrollView.swift in Sources */,
+			A10000000000000000000035 /* PracticeMessage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,8 +10,6 @@ struct DailyPlanView: View {
     @State private var selectedDate: Date
     @State private var weekStart: Date
     @State private var showAddTask = false
-    @State private var editTask: DailyTask?
-    @State private var showEdit = false
     @State private var showSummary = false
     @State private var summaryText = ""
     @State private var isSummarizing = false
@@ -230,11 +228,6 @@ struct DailyPlanView: View {
             .sheet(isPresented: $showAddTask) {
                 AddDailyTaskView(defaultDate: selectedDate)
             }
-            .sheet(isPresented: $showEdit) {
-                if let task = editTask {
-                    AddDailyTaskView(editTask: task)
-                }
-            }
             .sheet(isPresented: $showSummary) { summarySheet }
             .onAppear { cleanupOldData() }
         }
@@ -389,54 +382,52 @@ struct DailyPlanView: View {
     // MARK: - Task row
 
     private func taskRow(_ task: DailyTask) -> some View {
-        HStack(spacing: 12) {
-            Button {
-                guard !isPastDate else { return }
-                withAnimation(.spring(response: 0.3)) {
-                    task.isCompleted.toggle()
-                    task.completedAt = task.isCompleted ? Date() : nil
-                    try? modelContext.save()
+        NavigationLink {
+            DailyTaskDetailView(task: task)
+        } label: {
+            HStack(spacing: 12) {
+                Button {
+                    guard !isPastDate else { return }
+                    withAnimation(.spring(response: 0.3)) {
+                        task.isCompleted.toggle()
+                        task.completedAt = task.isCompleted ? Date() : nil
+                        try? modelContext.save()
+                    }
+                } label: {
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(
+                            isPastDate
+                                ? (task.isCompleted ? .green.opacity(0.5) : .gray.opacity(0.25))
+                                : (task.isCompleted ? .green : Color.lavender)
+                        )
                 }
-            } label: {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(
-                        isPastDate
-                            ? (task.isCompleted ? .green.opacity(0.5) : .gray.opacity(0.25))
-                            : (task.isCompleted ? .green : Color.lavender)
-                    )
-            }
-            .buttonStyle(.plain)
-            .disabled(isPastDate)
+                .buttonStyle(.plain)
+                .disabled(isPastDate)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(task.title)
-                    .font(.body)
-                    .foregroundStyle(isPastDate ? .gray.opacity(0.6) : (task.isCompleted ? .secondary : Color.lavender))
-                    .strikethrough(task.isCompleted, color: .secondary)
-                if !task.notes.isEmpty {
-                    Text(task.notes)
-                        .font(.caption)
-                        .foregroundStyle(isPastDate ? .gray.opacity(0.4) : .secondary)
-                        .lineLimit(1)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.title)
+                        .font(.body)
+                        .foregroundStyle(isPastDate ? .gray.opacity(0.6) : (task.isCompleted ? .secondary : Color.lavender))
+                        .strikethrough(task.isCompleted, color: .secondary)
+                    if !task.notes.isEmpty {
+                        Text(task.notes)
+                            .font(.caption)
+                            .foregroundStyle(isPastDate ? .gray.opacity(0.4) : .secondary)
+                            .lineLimit(1)
+                    }
+                    if !task.review.isEmpty {
+                        Text(task.review)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .lineLimit(1)
+                    }
                 }
-                if !task.review.isEmpty {
-                    Text(task.review)
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                        .lineLimit(1)
-                }
-            }
 
-            Spacer()
-        }
-        .padding(.vertical, 2)
-        .opacity(isPastDate ? 0.6 : 1.0)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard !isPastDate else { return }
-            editTask = task
-            showEdit = true
+                Spacer()
+            }
+            .padding(.vertical, 2)
+            .opacity(isPastDate ? 0.6 : 1.0)
         }
     }
 
