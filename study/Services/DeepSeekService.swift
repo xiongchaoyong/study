@@ -1,9 +1,18 @@
 import Foundation
 
 struct DeepSeekService {
-    private static let apiKey = "sk-e8b9521a1b1049eba35e917c170eda37"
+    /// API key 从钥匙串读取，不硬编码在代码里（避免泄露进仓库）。
+    private static var apiKey: String? { KeychainHelper.load(key: KeychainHelper.apiKeyKey) }
     private static let endpoint = "https://api.deepseek.com/chat/completions"
     private static let model = "deepseek-chat"
+
+    enum DeepSeekError: LocalizedError {
+        case missingAPIKey
+
+        var errorDescription: String? {
+            "未配置 DeepSeek API Key，请在 设置 → Backup 中填写"
+        }
+    }
 
     struct Message: Codable {
         let role: String
@@ -41,6 +50,8 @@ struct DeepSeekService {
         temperature: Double = 0.7,
         maxTokens: Int = 2000
     ) async throws -> String {
+        guard let apiKey else { throw DeepSeekError.missingAPIKey }
+
         var fullMessages = [Message(role: "system", content: systemPrompt)]
         fullMessages.append(contentsOf: messages)
 
@@ -73,6 +84,10 @@ struct DeepSeekService {
     ) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
+                guard let apiKey else {
+                    continuation.finish(throwing: DeepSeekError.missingAPIKey)
+                    return
+                }
                 do {
                     var fullMessages = [Message(role: "system", content: systemPrompt)]
                     fullMessages.append(contentsOf: messages)

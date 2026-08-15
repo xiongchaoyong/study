@@ -47,6 +47,7 @@
 		A10000000000000000000032 /* ExpressionPracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000032 /* ExpressionPracticeView.swift */; };
 		A10000000000000000000033 /* ExpressionTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000033 /* ExpressionTabView.swift */; };
 		A10000000000000000000036 /* ZoomableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000036 /* ZoomableScrollView.swift */; };
+		A10000000000000000000039 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000039 /* KeychainHelper.swift */; };
 		A10000000000000000000035 /* PracticeMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000035 /* PracticeMessage.swift */; };
 /* End PBXBuildFile section */
 
@@ -91,6 +92,7 @@
 		B10000000000000000000032 /* ExpressionPracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionPracticeView.swift; sourceTree = "<group>"; };
 		B10000000000000000000033 /* ExpressionTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionTabView.swift; sourceTree = "<group>"; };
 		B10000000000000000000036 /* ZoomableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableScrollView.swift; sourceTree = "<group>"; };
+		B10000000000000000000039 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		B10000000000000000000035 /* PracticeMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeMessage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -188,6 +190,7 @@
 				B1000000000000000000001A /* DeepSeekService.swift */,
 				B1000000000000000000001F /* DataExportService.swift */,
 				B10000000000000000000020 /* HotSearchService.swift */,
+				B10000000000000000000039 /* KeychainHelper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -300,6 +303,7 @@
 			A10000000000000000000032 /* ExpressionPracticeView.swift in Sources */,
 			A10000000000000000000033 /* ExpressionTabView.swift in Sources */,
 			A10000000000000000000036 /* ZoomableScrollView.swift in Sources */,
+			A10000000000000000000039 /* KeychainHelper.swift in Sources */,
 			A10000000000000000000035 /* PracticeMessage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

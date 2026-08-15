@@ -10,9 +10,45 @@ struct SettingsView: View {
     @State private var isExporting = false
     @State private var exportMessage: String?
 
+    @State private var apiKeyInput = ""
+    @State private var apiKeyConfigured = false
+
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    VStack(alignment: .leading, spacing: 10) {
+                        SecureField("粘贴 DeepSeek API Key", text: $apiKeyInput)
+                            .autocorrectionDisabled()
+                            .padding(10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.secondarySystemBackground))
+                            )
+
+                        HStack {
+                            if apiKeyConfigured {
+                                Label("已配置", systemImage: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                            } else {
+                                Label("未配置", systemImage: "xmark.circle")
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("保存") { saveAPIKey() }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+
+                        Text("在 platform.deepseek.com 创建 API Key，粘贴后保存。Key 只保存在本机钥匙串，不会上传或写入代码。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("DeepSeek API Key")
+                }
+
                 Section {
                     Button {
                         exportDatabase()
@@ -129,6 +165,9 @@ struct SettingsView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                apiKeyConfigured = KeychainHelper.load(key: KeychainHelper.apiKeyKey) != nil
+            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Backup & Export")
@@ -223,6 +262,17 @@ struct SettingsView: View {
             exportMessage = "PDF exported at \(Date().formatted(date: .omitted, time: .shortened))"
         } else {
             exportMessage = "Export failed"
+        }
+    }
+
+    // MARK: - DeepSeek API key
+
+    private func saveAPIKey() {
+        let trimmed = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        if KeychainHelper.save(key: KeychainHelper.apiKeyKey, value: trimmed) {
+            apiKeyInput = ""
+            apiKeyConfigured = true
         }
     }
 }
